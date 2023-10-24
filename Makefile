@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -std=c99 -O3 -g
-SRCS = tileblaster.c file_funcs.c tile_funcs.c stack.c mem.c dfs.c
+SRCS = tileblaster.c file_funcs.c tile_funcs.c stack.c mem.c vars.c
 OBJS = $(SRCS:.c=.o)
 TARGET = tileblaster
 

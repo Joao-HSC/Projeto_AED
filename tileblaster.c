@@ -5,7 +5,7 @@
 #include "mem.h"
 #include "files.h"
 #include "tiles.h"
-#include "dfs.h"
+#include "vars.h"
 
 int main(int argc, char *argv[]) {
 
@@ -96,7 +96,6 @@ int main(int argc, char *argv[]) {
 
                 free_visited(visited, num_rows);
             }
-
                             
 
             /* Variant 2 */
@@ -137,7 +136,7 @@ int main(int argc, char *argv[]) {
             else if(v == -3){
                 visited = alloc_visit(num_rows, num_columns);
                 
-                head_coords = dfs_3(tileset, v, num_rows, num_columns, visited);
+                head_coords = dfs_3(tileset, num_rows, num_columns, visited);
 
                 if (head_coords != NULL) {
                     Coordinates_plus* current = head_coords;

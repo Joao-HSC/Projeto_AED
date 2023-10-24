@@ -80,6 +80,7 @@ int coords_analyze(int** tileset, bool ** visited, int row, int col, int num_row
  *
  * Description: Changes all the values of the same colour adjacent tiles to "-1"
  *****************************************************************************/
+
 int **coords_replace(int** tileset, int row, int col, int num_row, int num_col) {
     static int drow[] = { 0, 0, -1, 1 };
     static int dcol[] = { -1, 1, 0, 0 };
@@ -111,7 +112,7 @@ int **coords_replace(int** tileset, int row, int col, int num_row, int num_col) 
             }
         }
     }
-
+    
     free(front->array);
     free(front);
     return tileset;
@@ -128,6 +129,7 @@ int **coords_replace(int** tileset, int row, int col, int num_row, int num_col) 
  * Description: Aplies gravity to the colourful tiles, then aplies the 
  * horizontal push to each individual column.
  *****************************************************************************/
+
 int **gravity(int **tileset, int num_rows, int num_columns) {
    for (int i = 0; i < num_columns; i++) {
     int fall = 0;
@@ -215,6 +217,7 @@ Coordinates_plus* coords_list(int** tileset, bool** visited, int num_rows, int n
                 new_coord->col = h;
                 new_coord->score = score(n_adj);
                 new_coord->next = NULL;
+                printf("%d %d %d |",new_coord->row, new_coord->col, new_coord->score);
 
                 if (head == NULL) {
                     head = new_coord;
