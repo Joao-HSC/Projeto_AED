@@ -217,7 +217,6 @@ Coordinates_plus* coords_list(int** tileset, bool** visited, int num_rows, int n
                 new_coord->col = h;
                 new_coord->score = score(n_adj);
                 new_coord->next = NULL;
-                printf("%d %d %d |",new_coord->row, new_coord->col, new_coord->score);
 
                 if (head == NULL) {
                     head = new_coord;

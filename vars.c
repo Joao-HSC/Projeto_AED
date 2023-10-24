@@ -114,14 +114,15 @@ Node* next_branch(Node* current) {
 
     /* while we don't reach the parent of the head_node (NULL), backtrack */
     while (current != NULL) {
-        if (current->children != NULL && current->children->next != NULL) {
-            aux = current->children;
-            current->children = current->children->next;
-            free(aux);
+       
+        if (current->children != NULL && current->children->next != NULL) { printf("I FOUND CHILDREN ");
+            aux = current->children; printf("%d %d %d |",current->children->row, current->children->col, current->children->score);
+            current->children = current->children->next;  printf("%d %d %d |",current->children->row, current->children->col, current->children->score);
+            free(aux); printf("%d %d %d |",current->children->row, current->children->col, current->children->score);
             return current;
         }
 
-        if (current->parent == NULL) {
+        if (current->parent == NULL) {  printf("IM STOPPIN ");
             if (current->children) {
                 free(current->children);
             }
@@ -131,7 +132,7 @@ Node* next_branch(Node* current) {
         }
 
         parent = current->parent;
-        if (current->children != NULL) {
+        if (current->children != NULL) {  printf("IM GOIN BACK ");
             free(current->children);
         }
         free(current->coordinates);
@@ -157,7 +158,8 @@ Coordinates_plus* dfs_2(int** tileset, int v, int n_rows, int n_cols, bool** vis
     Node* head_node = NULL;
     Node* current = NULL;
     int min_score = v; 
-        
+
+            /* initialize head_node */
             current = (Node*)malloc(sizeof(Node));
             head_node = current;
             head_node->parent = NULL;
@@ -168,23 +170,29 @@ Coordinates_plus* dfs_2(int** tileset, int v, int n_rows, int n_cols, bool** vis
             head_node->score = 0;
             head_node->children = coords_list(head_node->tileset, visited, n_rows, n_cols);
             reset_visit(visited, n_rows, n_cols);
-
+            printf("%d %d %d |",current->children->row, current->children->col, current->children->score);
+            /* if the head_node has no children it means there's nothing we can do */
             if(head_node->children == NULL){
                 free(head_node->coordinates);
                 free(head_node);
                 return NULL;
             }
-           head_node->child = create_child(head_node, head_node->children, n_rows, n_cols, visited);
-           current = current->child;
+            /* creates a child to the head node and we analyze it after */
+            head_node->child = create_child(head_node, head_node->children, n_rows, n_cols, visited);
+            current = current->child;
 
         /* while none of the conditions inside is met we'll keep backtracking and branching the tree */
         while(1) {     
-            /* if we find a leaf node we'll check its score */
+            /* 
+            * if we find a leaf node we'll check its score,
+            * if it matches the minimum score, we'll retrieve its path
+            * else we'll try to find a new branch
+            */
             if(current->children == NULL){
                 if(current->score >= min_score){
                     return extract_path_2(current);
                 }
-                printf("branch ");
+                /* backtrack */
                 current = next_branch(current);
                 if (current == NULL){
                     return NULL;
@@ -212,6 +220,7 @@ Coordinates_plus* dfs_3(int** tileset, int n_rows, int n_cols, bool** visited) {
     Coordinates_plus* best_path = NULL;
     int max_score = -1; 
 
+    /* initialize head_node */
     head_node = (Node*)malloc(sizeof(Node));
     current = head_node;
     head_node->parent = NULL;
@@ -224,35 +233,49 @@ Coordinates_plus* dfs_3(int** tileset, int n_rows, int n_cols, bool** visited) {
     head_node->children = coords_list(head_node->tileset, visited, n_rows, n_cols);
     reset_visit(visited, n_rows, n_cols);
 
+    /* if the head_node has no children it means there's nothing we can do */
     if(head_node->children == NULL) {
         free(head_node->coordinates);
         free(head_node);
         return NULL;
     }
+    printf("%d %d %d |",head_node->children->row, head_node->children->col, head_node->children->score);
 
     /* while none of the conditions inside is met we'll keep backtracking and branching the tree */
     while (1) {
+
+        /* 
+        * if we find a leaf node we'll check its score to see if it's greater than max_score
+        * ff so, we'll retrieve its path
+        * else we'll try to find a new branch
+        */
         if(current->children == NULL) {
             if(current->score > max_score) {  
                 max_score = current->score;  
                 
-                /* Free the previous best path */
+                /* free the previous best path */
                 while(best_path != NULL) {
                     Coordinates_plus* aux = best_path;
                     best_path = best_path->next;
                     free(aux);
                 }
 
-                /* Extract the new best path */
+                /* extract the new best path */
                 best_path = extract_path_3(current);
             }
+            /* backtrack */ printf("branch ");
             current = next_branch(current);
+           //printf("%d %d %d |", current->children->row, current->children->col, current->children->score);
             if (current == NULL) {
                 return best_path;
             }
         } 
+        /* next node */
         current->child = create_child(current, current->children, n_rows, n_cols, visited);
         current = current->child;
+        if(current->children != NULL){
+        printf("%d %d %d |",current->children->row, current->children->col, current->children->score);
+        } else{printf("no coords");}
         
     }    
 }
