@@ -11,6 +11,7 @@ typedef struct Node {
     int score;
 } Node;
 
+Coordinates_plus* var_1(int**tileset, bool**visited, int n_rows, int n_cols);
 Coordinates_plus* dfs_2(int** tileset, int v, int n_rows, int n_cols, bool** visited);
 Coordinates_plus* dfs_3(int** tileset, int n_rows, int n_cols, bool** visited);
 Coordinates_plus* extract_path_2(Node* current);

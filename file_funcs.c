@@ -90,10 +90,6 @@ char *create_ss(char *argv[]){
 int write_file(char *argv[], int **tileset, int num_rows, int num_columns, int v, int points, int n_broken, Coordinates_plus* head, char *filename) {
 
     FILE *file = fopen(filename, "a");
-    if(head == NULL){
-        n_broken = 0;
-        points = -1;
-    }
 
     if (file == NULL) {
         exit(1);

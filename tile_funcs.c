@@ -183,6 +183,7 @@ Coordinates_plus* coords_list(int** tileset, bool** visited, int num_rows, int n
     Coordinates_plus* head = NULL;
     Coordinates_plus* tail = NULL;
 
+    /* search the tileset every tile or so */
     for (int j = 0; j < num_rows; j++) {
         for (int h = (j % 2 == 0) ? 1 : 0; h < num_col; h += 2) {
             tile_n = tileset[j][h];
@@ -193,6 +194,7 @@ Coordinates_plus* coords_list(int** tileset, bool** visited, int num_rows, int n
             Coordinates aux = {j, h};
             push(front, aux);
 
+            /* while the stack isn't empty, keep popping adjacent coords so we make the list */
             while (!is_empty(front)) {
                 Coordinates current = pop(front);
 
