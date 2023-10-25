@@ -1,6 +1,7 @@
 #ifndef mem_h_
 #define mem_h_
 
+int **alloc_tileset(int n_rows, int n_columns);
 int **read_store_tileset(FILE *file, int num_rows, int num_columns);
 void free_tileset(int **tileset, int numRows);
 bool** alloc_visit(int num_rows, int num_columns);

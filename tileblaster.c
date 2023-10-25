@@ -79,11 +79,19 @@ int main(int argc, char *argv[]) {
 
         /* calculate points and n_broken based on the head_coords list */
         current = head_coords;
-                
-        for (n_broken = -1; current != NULL; n_broken++) {
-            points += current->score;
-            if(current->next == NULL) points = current->score;
-            current = current->next;    
+        if(v == -1){
+            for (n_broken = 0; current != NULL; n_broken++) {
+                points += current->score;
+                if(current->next == NULL) points = current->score;
+                current = current->next;    
+            }
+        }    
+        else{
+            for (n_broken = -1; current != NULL; n_broken++) {
+                points += current->score;
+                if(current->next == NULL) points = current->score;
+                current = current->next;    
+            }
         }     
 
         /* write file and get ready to restart */

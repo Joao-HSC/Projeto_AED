@@ -46,6 +46,36 @@ int **read_store_tileset(FILE *file, int num_rows, int num_columns) {
 }
 
 /******************************************************************************
+ * alloc_tileset()
+ *
+ * Arguments: tileset - tileset we're storing,
+ * n_rows and n_columns
+ * 
+ * Returns:  Stored tileset
+ *
+ * Description: Stored the matrix we're going to analyze
+ *****************************************************************************/
+int **alloc_tileset(int n_rows, int n_columns){
+
+    // Allocate memory for the tileset
+    int** tileset = (int **)malloc(n_rows * sizeof(int *));
+    if (tileset == NULL) {
+        exit(1);
+    }
+
+    // Allocate memory for each row
+    for (int i = 0; i < n_rows; i++) {
+        tileset[i] = (int *)malloc(n_columns * sizeof(int));
+        if (tileset[i] == NULL) {
+            free_tileset(tileset, i);
+            exit(1);
+        }
+    }
+    return tileset;
+}
+
+
+/******************************************************************************
  * free_tileset()
  *
  * Arguments: tileset - so we have access to the memory allocated to the tileset,

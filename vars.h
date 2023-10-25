@@ -11,12 +11,12 @@ typedef struct Node {
     int score;
 } Node;
 
+Coordinates_plus* extract_path_2(Node *current, int n_rows);
+Coordinates_plus* extract_path_3(Node* current);
 Coordinates_plus* var_1(int**tileset, bool**visited, int n_rows, int n_cols);
 Coordinates_plus* dfs_2(int** tileset, int v, int n_rows, int n_cols, bool** visited);
 Coordinates_plus* dfs_3(int** tileset, int n_rows, int n_cols, bool** visited);
-Coordinates_plus* extract_path_2(Node* current);
-Coordinates_plus* extract_path_3(Node* current);
 Node* create_child(Node* current, Coordinates_plus* node_aux, int n_rows, int n_cols, bool** visited);
-Node* next_branch(Node* current);
+Node* next_branch(Node* current, int n_rows);
 
 #endif

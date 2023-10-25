@@ -182,6 +182,7 @@ Coordinates_plus* coords_list(int** tileset, bool** visited, int num_rows, int n
     Stack* front = newStack(num_col * num_rows);
     Coordinates_plus* head = NULL;
     Coordinates_plus* tail = NULL;
+    Coordinates_plus* aux = NULL;
 
     /* search the tileset every tile or so */
     for (int j = 0; j < num_rows; j++) {
@@ -232,6 +233,14 @@ Coordinates_plus* coords_list(int** tileset, bool** visited, int num_rows, int n
             }
         }
     }
+    aux = head;
+if(aux != NULL){
+    while(aux != NULL){
+    printf("%d %d %d |", aux->row,aux->col, aux->score);
+    aux = aux->next;
+}
+
+}else{printf("!no possible plays!");}
 
     free(front->array);
     free(front);
