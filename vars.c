@@ -21,7 +21,7 @@ Coordinates_plus *extract_path_2(Node *current, int n_rows){
     Coordinates_plus *path_head = NULL;
     Coordinates_plus *aux = NULL;
     Node *prev = NULL;
-
+    /* create a list with the instructions to follow while tracing back the tree */
     while (current != NULL)
     {
         Coordinates_plus *path_node = (Coordinates_plus *)malloc(sizeof(Coordinates_plus));
@@ -59,14 +59,14 @@ Coordinates_plus *extract_path_2(Node *current, int n_rows){
 Coordinates_plus *extract_path_3(Node *current){
 
     Coordinates_plus *path_head = NULL;
-
+    /* create a list with the instructions to follow while tracing back the tree */
     while (current != NULL)
     {
         Coordinates_plus *path_node = (Coordinates_plus *)malloc(sizeof(Coordinates_plus));
         path_node->row = current->coordinates->row;
         path_node->col = current->coordinates->col;
         path_node->score = current->score; printf("!%d %d %d |!", current->coordinates->row, current->coordinates->col, current->score);
-        path_node->next = path_head; 
+        path_node->next = path_head;
         path_head = path_node;
         current = current->parent;
     }
@@ -262,6 +262,7 @@ Coordinates_plus *dfs_2(int **tileset, int v, int n_rows, int n_cols, bool **vis
     if (head_node->children == NULL)
     {
         free(head_node->coordinates);
+        free_tileset(head_node->tileset, n_rows);
         free(head_node);
         return NULL;
     }
@@ -309,7 +310,6 @@ Coordinates_plus *dfs_2(int **tileset, int v, int n_rows, int n_cols, bool **vis
 
 Coordinates_plus *dfs_3(int **tileset, int n_rows, int n_cols, bool **visited)
 {
-
     Node *head_node = NULL;
     Node *current = NULL;
     Coordinates_plus *best_path = NULL;

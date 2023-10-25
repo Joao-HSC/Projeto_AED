@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
             visited = alloc_visit(n_rows, n_cols);
             
             head_coords = dfs_2(tileset, v, n_rows, n_cols, visited);
-            free_tileset(tileset, n_rows);
+            
             free_visited(visited, n_rows);
             
         }
@@ -100,14 +100,7 @@ int main(int argc, char *argv[]) {
         else if(v == 3 && points == 0){     
             n_broken = 0;
         }
-
-        if(v >= 0 && points == 0){
-            n_broken = 0;
-            points = -1;
-        }
-        else if(v == -3 && points == 0){     
-            n_broken = 0;
-        }
+        
         /* write file and get ready to restart */
         write_file(argv, n_rows, n_cols, v, points, n_broken, head_coords, ss_name);       
 
