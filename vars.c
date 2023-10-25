@@ -65,8 +65,8 @@ Coordinates_plus *extract_path_3(Node *current){
         Coordinates_plus *path_node = (Coordinates_plus *)malloc(sizeof(Coordinates_plus));
         path_node->row = current->coordinates->row;
         path_node->col = current->coordinates->col;
-        path_node->score = current->score;
-        path_node->next = path_head;
+        path_node->score = current->score; printf("!%d %d %d |!", current->coordinates->row, current->coordinates->col, current->score);
+        path_node->next = path_head; 
         path_head = path_node;
         current = current->parent;
     }
@@ -94,13 +94,20 @@ Node *create_child(Node *current, Coordinates_plus *node_aux, int n_rows, int n_
     child->coordinates = (Coordinates *)malloc(sizeof(Coordinates));
     child->coordinates->row = node_aux->row;
     child->coordinates->col = node_aux->col;
+
     aux = alloc_tileset(n_rows, n_cols);
-    aux = gravity(coords_replace(current->tileset, node_aux->row, node_aux->col, n_rows, n_cols), n_rows, n_cols);
+    int** result_from_gravity = gravity(coords_replace(current->tileset, node_aux->row, node_aux->col, n_rows, n_cols), n_rows, n_cols);
+
+    for (int i = 0; i < n_rows; i++) {
+        for (int j = 0; j < n_cols; j++) {
+            aux[i][j] = result_from_gravity[i][j];
+        }
+    }
+
     child->tileset = aux;
     child->children = coords_list(child->tileset, visited, n_rows, n_cols);
     reset_visit(visited, n_rows, n_cols);
     child->score = current->score + node_aux->score;
-
     return child;
 }
 
@@ -118,54 +125,45 @@ Node *create_child(Node *current, Coordinates_plus *node_aux, int n_rows, int n_
 Node *next_branch(Node *current, int n_rows){
 
     Coordinates_plus *aux = NULL;
-    Node *tmp = NULL;
     Node *parent = NULL;
 
     /* while we don't reach the parent of the head_node (NULL), backtrack */
-    while (1)
-    {
+    while (1){
+    /* if we reach the head_node and there's no more kids, return NULL */
+        if (current == NULL){ printf("STOPPING |");
+            printf("NULL |");
+            return NULL;
+        }
         parent = current->parent;
-        /* if there's children asscoiated with a node, free one */
-        if (current->children != NULL)
-        {
-            if (current->children->next != NULL)
-            {
-                printf("I FOUND CHILDREN ");
+        /* if there's children associated with a node, free one */
+        if (current->children != NULL){printf("NEXT CHILD! |");
+            if (current->children->next != NULL){
                 aux = current->children;
                 current->children = current->children->next;
                 free(aux);
-                printf("%d %d %d |", current->children->row, current->children->col, current->children->score);
                 return current;
             }
-            //parent = current->parent;
+            printf("GOING BACK |");
             free(current->children);
             free(current->coordinates);
             free_tileset(current->tileset, n_rows);
             free(current);
-            current = parent;
-            if (current == NULL)
-            {
-                printf("IM STOPPIN ");
-                return NULL;
-            }
+            current = parent;  
         }
-        /* if there's no children asscoiated with a node, backtrack */
-        else
-        {
-            printf("IM GOIN BACK ");
-            tmp = current;
+        /* if there's no children associated with a node, backtrack */
+        else{
+            free(current->coordinates);
+            free_tileset(current->tileset, n_rows);
+            free(current);
             current = parent;
-            free_tileset(tmp->tileset, n_rows);
-            free(tmp->coordinates);
-            free(tmp);
         }
-        /* if we reach the head_node and there's no more kids, return NULL */
     }
 }
+
 /******************************************************************************
  * var 1()
  *
- * Arguments: tileset - , visited - , n_rows, n_columns
+ * Arguments: tileset - initial tileset, visited - , n_rows, n_columns
  *
  * Returns: A list with the coordinates that have been broken until the tileset is unsolvable
  *
@@ -179,38 +177,30 @@ Coordinates_plus *var_1(int **tileset, bool **visited, int n_rows, int n_cols)
     Coordinates_plus *current = NULL;
     Coordinates_plus *head_coords = NULL;
 
-    while (1)
-    {
+    while (1){
         restart = 0;
 
-        for (int i = 0; i < n_rows; i++)
-        {
+        for (int i = 0; i < n_rows; i++){
             if (restart == 1)
                 break;
 
-            for (int j = (i % 2 == 0) ? 1 : 0; j < n_cols; j += 2)
-            {
+            for (int j = (i % 2 == 0) ? 1 : 0; j < n_cols; j += 2){
                 aux = coords_analyze(tileset, visited, i, j, n_rows, n_cols);
 
-                if (aux > 1)
-                {
+                if (aux > 1){
                     restart = 1;
 
-                    if (current == NULL)
-                    {
+                    if (current == NULL){
                         current = (Coordinates_plus *)malloc(sizeof(Coordinates_plus));
-                        if (current == NULL)
-                        {
+                        if (current == NULL){
                             exit(1);
                         }
 
                         head_coords = current;
                     }
-                    else
-                    {
+                    else{
                         current->next = (Coordinates_plus *)malloc(sizeof(Coordinates_plus));
-                        if (current->next == NULL)
-                        {
+                        if (current->next == NULL){
                             exit(1);
                         }
                         current = current->next;
@@ -219,6 +209,7 @@ Coordinates_plus *var_1(int **tileset, bool **visited, int n_rows, int n_cols)
                     current->row = i;
                     current->col = j;
                     current->score = score(aux);
+                    printf("%d |", current->score);
                     current->next = NULL;
 
                     tileset = coords_replace(tileset, i, j, n_rows, n_cols);
@@ -228,8 +219,7 @@ Coordinates_plus *var_1(int **tileset, bool **visited, int n_rows, int n_cols)
             }
         }
 
-        if (restart == 0)
-        {
+        if (restart == 0){
             break;
         }
     }
@@ -284,16 +274,13 @@ Coordinates_plus *dfs_2(int **tileset, int v, int n_rows, int n_cols, bool **vis
          * if it's greater or equal than the the minimum score, we'll retrieve its path
          * else we'll try to find a new branch
          */
-        if (current->children == NULL)
-        {
-            if (current->score >= min_score)
-            {
+        if (current->children == NULL){
+            if (current->score >= min_score){
                 return extract_path_2(current, n_rows);
             }
             /* backtrack */
             current = next_branch(current, n_rows);
-            if (current == NULL)
-            {
+            if (current == NULL){
                 return NULL;
             }
         }
@@ -334,36 +321,28 @@ Coordinates_plus *dfs_3(int **tileset, int n_rows, int n_cols, bool **visited)
     reset_visit(visited, n_rows, n_cols);
 
     /* if the head_node has no children it means there's nothing we can do */
-    if (head_node->children == NULL)
-    {
-        free_tileset(tileset, n_rows);
+    if (head_node->children == NULL){
         free(head_node->coordinates);
         free_tileset(head_node->tileset, n_rows);
         free(head_node);
         return NULL;
     }
-    printf(" -new child- ");
     current->child = create_child(current, current->children, n_rows, n_cols, visited);
     current = current->child;
 
     /* while none of the conditions inside is met we'll keep backtracking and branching the tree */
-    while (1)
-    {
-
+    while (1){
         /*
          * if we find a leaf node we'll check its score to see if it's greater than max_score
-         * ff so, we'll retrieve its path
+         * if so, we'll retrieve its path
          * else we'll try to find a new branch
          */
-        if (current->children == NULL)
-        {
-            if (current->score > max_score)
-            {
+        if (current->children == NULL){
+            if (current->score > max_score){
                 max_score = current->score;
 
                 /* free the previous best path */
-                while (best_path != NULL)
-                {
+                while (best_path != NULL){
                     Coordinates_plus *aux = best_path;
                     best_path = best_path->next;
                     free(aux);
@@ -372,8 +351,7 @@ Coordinates_plus *dfs_3(int **tileset, int n_rows, int n_cols, bool **visited)
                 /* extract the new best path */
                 best_path = extract_path_3(current);
             }
-            /* backtrack */ printf("branch ");
-
+            /* backtrack */
             current = next_branch(current, n_rows);
 
             if (current == NULL)
@@ -381,7 +359,6 @@ Coordinates_plus *dfs_3(int **tileset, int n_rows, int n_cols, bool **visited)
                 return best_path;
             }
         }
-        printf(" -new child- ");
         current->child = create_child(current, current->children, n_rows, n_cols, visited);
         current = current->child;
     }

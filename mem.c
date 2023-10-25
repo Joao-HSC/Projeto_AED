@@ -85,15 +85,13 @@ int **alloc_tileset(int n_rows, int n_columns){
  * 
  * Description: Frees a 2D array
  *****************************************************************************/
-void free_tileset(int **tileset, int num_rows) {
-    if(num_rows < 0){
-        num_rows = -num_rows;
-    }
+void free_tileset(int **tileset, int n_rows) {
 
-    for (int i = 0; i < num_rows; i++) {
+    for (int i = 0; i < n_rows; i++) {
         free(tileset[i]);
     }
     free(tileset);
+    tileset = NULL;
 }
 
 /******************************************************************************

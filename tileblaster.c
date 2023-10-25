@@ -40,6 +40,7 @@ int main(int argc, char *argv[]) {
         if (v == -1) {
             visited = alloc_visit(num_rows, num_columns);
             head_coords = var_1(tileset, visited, num_rows, num_columns);
+            free_tileset(tileset, num_rows);
             free_visited(visited, num_rows);
         }
                         
@@ -56,7 +57,7 @@ int main(int argc, char *argv[]) {
             visited = alloc_visit(num_rows, num_columns);
             
             head_coords = dfs_2(tileset, v, num_rows, num_columns, visited);
-            
+            free_tileset(tileset, num_rows);
             free_visited(visited, num_rows);
             
         }
@@ -74,29 +75,27 @@ int main(int argc, char *argv[]) {
             head_coords = dfs_3(tileset, num_rows, num_columns, visited);
             
             free_visited(visited, num_rows);
-
+            printf("end one| ");
         }
 
         /* calculate points and n_broken based on the head_coords list */
         current = head_coords;
+  
         if(v == -1){
             for (n_broken = 0; current != NULL; n_broken++) {
                 points += current->score;
-                if(current->next == NULL) points = current->score;
-                current = current->next;    
+                current = current->next;
             }
         }    
         else{
             for (n_broken = -1; current != NULL; n_broken++) {
-                points += current->score;
                 if(current->next == NULL) points = current->score;
-                current = current->next;    
+                current = current->next;
             }
         }     
 
         /* write file and get ready to restart */
-        write_file(argv, tileset, num_rows, num_columns, v, points, n_broken, head_coords, ss_name);        
-        free_tileset(tileset, num_rows);
+        write_file(argv, num_rows, num_columns, v, points, n_broken, head_coords, ss_name);       
 
         /* free list */
         current = head_coords;

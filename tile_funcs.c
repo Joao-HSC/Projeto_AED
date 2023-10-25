@@ -178,11 +178,10 @@ Coordinates_plus* coords_list(int** tileset, bool** visited, int num_rows, int n
     static int drow[] = {0, 0, -1, 1};
     static int dcol[] = {-1, 1, 0, 0};
     int tile_n, n_adj;
-
+ 
     Stack* front = newStack(num_col * num_rows);
     Coordinates_plus* head = NULL;
     Coordinates_plus* tail = NULL;
-    Coordinates_plus* aux = NULL;
 
     /* search the tileset every tile or so */
     for (int j = 0; j < num_rows; j++) {
@@ -233,7 +232,7 @@ Coordinates_plus* coords_list(int** tileset, bool** visited, int num_rows, int n
             }
         }
     }
-    aux = head;
+    Coordinates_plus* aux = head;
 if(aux != NULL){
     while(aux != NULL){
     printf("%d %d %d |", aux->row,aux->col, aux->score);
