@@ -1,5 +1,6 @@
 #ifndef tiles_h_
 #define tiles_h_
+#include <stdbool.h>
 
 typedef struct Coordinates {
     int row;

@@ -1,5 +1,6 @@
 #ifndef vars_h_
 #define vars_h_
+#include <stdbool.h>
 #include "tiles.h"
 
 typedef struct Node {

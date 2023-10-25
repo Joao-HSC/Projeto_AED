@@ -91,9 +91,23 @@ int main(int argc, char *argv[]) {
             for (n_broken = -1; current != NULL; n_broken++) {
                 if(current->next == NULL) points = current->score;
                 current = current->next;
-            }
+            }printf("%d", points);
         }     
+        if(v >= 0 && points == 0){
+            n_broken = 0;
+            points = -1;
+        }
+        else if(v == 3 && points == 0){     
+            n_broken = 0;
+        }
 
+        if(v >= 0 && points == 0){
+            n_broken = 0;
+            points = -1;
+        }
+        else if(v == -3 && points == 0){     
+            n_broken = 0;
+        }
         /* write file and get ready to restart */
         write_file(argv, n_rows, n_cols, v, points, n_broken, head_coords, ss_name);       
 
