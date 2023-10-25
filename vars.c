@@ -114,7 +114,7 @@ Node *create_child(Node *current, Coordinates_plus *node_aux, int n_rows, int n_
 /******************************************************************************
  * next_branch()
  *
- * Arguments: current - leaf node
+ * Arguments: current - leaf node, n_rows - number of rows in each tileset
  *
  * Returns: the next node we're able to investigate which has not been analyzed yet
  *
@@ -163,7 +163,8 @@ Node *next_branch(Node *current, int n_rows){
 /******************************************************************************
  * var 1()
  *
- * Arguments: tileset - initial tileset, visited - , n_rows, n_columns
+ * Arguments: tileset - initial tileset, visited - boolean matrix , n_rows - number of rows in the tileset,
+ *  n_columns - number of columns in the tileset
  *
  * Returns: A list with the coordinates that have been broken until the tileset is unsolvable
  *
@@ -179,7 +180,7 @@ Coordinates_plus *var_1(int **tileset, bool **visited, int n_rows, int n_cols)
 
     while (1){
         restart = 0;
-
+        /* analyze the matrix every square or so (almost like in a chess manner) */
         for (int i = 0; i < n_rows; i++){
             if (restart == 1)
                 break;
@@ -187,6 +188,7 @@ Coordinates_plus *var_1(int **tileset, bool **visited, int n_rows, int n_cols)
             for (int j = (i % 2 == 0) ? 1 : 0; j < n_cols; j += 2){
                 aux = coords_analyze(tileset, visited, i, j, n_rows, n_cols);
 
+                /* if there's a stain make a list with the coordinates of that stain */
                 if (aux > 1){
                     restart = 1;
 
@@ -211,7 +213,7 @@ Coordinates_plus *var_1(int **tileset, bool **visited, int n_rows, int n_cols)
                     current->score = score(aux);
                     printf("%d |", current->score);
                     current->next = NULL;
-
+                    /* refresh the tileset with the broken stain */
                     tileset = coords_replace(tileset, i, j, n_rows, n_cols);
                     tileset = gravity(tileset, n_rows, n_cols);
                     visited = reset_visit(visited, n_rows, n_cols);
@@ -229,7 +231,8 @@ Coordinates_plus *var_1(int **tileset, bool **visited, int n_rows, int n_cols)
 /******************************************************************************
  * dfs_2()
  *
- * Arguments: tileset - initial tileset, v - min score, n_rows, n_cols, visited
+ * Arguments: tileset - initial tileset, v - min score, n_rows - number of rows in the tileset,
+ *  n_columns - number of columns in the tileset, visited - boolean matrix
  *
  * Returns: A list with the coordinates of the path to the minimum v score
  *
@@ -278,7 +281,11 @@ Coordinates_plus *dfs_2(int **tileset, int v, int n_rows, int n_cols, bool **vis
             if (current->score >= min_score){
                 return extract_path_2(current, n_rows);
             }
-            /* backtrack */
+            /* 
+            * if the backtracking returns a new node with children, start creating the new branch
+            * else return the list with the instrucitons for a set of plays 
+            * which will give us a score greater or equal than v
+            */
             current = next_branch(current, n_rows);
             if (current == NULL){
                 return NULL;
@@ -292,7 +299,8 @@ Coordinates_plus *dfs_2(int **tileset, int v, int n_rows, int n_cols, bool **vis
 /******************************************************************************
  * dfs_3()
  *
- * Arguments: tileset - initial tileset, v - min score, n_rows, n_cols, visited
+ * Arguments: tileset - initial tileset, n_rows - number of rows in the tileset,
+ *  n_columns - number of columns in the tileset, visited - boolean matrix
  *
  * Returns: A list with the coordinates of the path to the max score
  *
@@ -351,7 +359,10 @@ Coordinates_plus *dfs_3(int **tileset, int n_rows, int n_cols, bool **visited)
                 /* extract the new best path */
                 best_path = extract_path_3(current);
             }
-            /* backtrack */
+            /* 
+            * if the backtracking returns a new node with children, start creating the new branch
+            * else return the list with the instrucitons for the best score
+            */
             current = next_branch(current, n_rows);
 
             if (current == NULL)
@@ -359,6 +370,7 @@ Coordinates_plus *dfs_3(int **tileset, int n_rows, int n_cols, bool **visited)
                 return best_path;
             }
         }
+        
         current->child = create_child(current, current->children, n_rows, n_cols, visited);
         current = current->child;
     }

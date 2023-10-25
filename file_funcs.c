@@ -87,7 +87,7 @@ char *create_ss(char *argv[]){
  *
  * Description: Writes in the new .singlestep file
  *****************************************************************************/
-int write_file(char *argv[], int num_rows, int num_columns, int v, int points, int n_broken, Coordinates_plus* head, char *filename) {
+int write_file(char *argv[], int n_rows, int n_cols, int v, int points, int n_broken, Coordinates_plus* head, char *filename) {
 
     FILE *file = fopen(filename, "a");
 
@@ -95,7 +95,7 @@ int write_file(char *argv[], int num_rows, int num_columns, int v, int points, i
         exit(1);
     }
 
-        fprintf(file, "%d %d %d\n", num_rows, num_columns, v);
+        fprintf(file, "%d %d %d\n", n_rows, n_cols, v);
  
         /* variant 1 */
         if (v == -1) {

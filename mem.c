@@ -13,18 +13,18 @@
  *
  * Description: Stored the matrix we're going to analyze
  *****************************************************************************/
-int **read_store_tileset(FILE *file, int num_rows, int num_columns) {
+int **read_store_tileset(FILE *file, int n_rows, int n_cols) {
     int **tileset;
 
     // Allocate memory for the tileset
-    tileset = (int **)malloc(num_rows * sizeof(int *));
+    tileset = (int **)malloc(n_rows * sizeof(int *));
     if (tileset == NULL) {
         exit(1);
     }
 
     // Allocate memory for each row
-    for (int i = 0; i < num_rows; i++) {
-        tileset[i] = (int *)malloc(num_columns * sizeof(int));
+    for (int i = 0; i < n_rows; i++) {
+        tileset[i] = (int *)malloc(n_cols * sizeof(int));
         if (tileset[i] == NULL) {
             free_tileset(tileset, i);
             exit(1);
@@ -32,10 +32,10 @@ int **read_store_tileset(FILE *file, int num_rows, int num_columns) {
     }
 
     // Read and store tileset data
-    for (int i = num_rows - 1; i >= 0; i--) {
-        for (int j = 0; j < num_columns; j++) {
+    for (int i = n_rows - 1; i >= 0; i--) {
+        for (int j = 0; j < n_cols; j++) {
             if (fscanf(file, "%d", &tileset[i][j]) != 1) {
-                free_tileset(tileset, num_rows);
+                free_tileset(tileset, n_rows);
                 exit(1);
             }
             
@@ -55,7 +55,7 @@ int **read_store_tileset(FILE *file, int num_rows, int num_columns) {
  *
  * Description: Stored the matrix we're going to analyze
  *****************************************************************************/
-int **alloc_tileset(int n_rows, int n_columns){
+int **alloc_tileset(int n_rows, int n_cols){
 
     // Allocate memory for the tileset
     int** tileset = (int **)malloc(n_rows * sizeof(int *));
@@ -65,7 +65,7 @@ int **alloc_tileset(int n_rows, int n_columns){
 
     // Allocate memory for each row
     for (int i = 0; i < n_rows; i++) {
-        tileset[i] = (int *)malloc(n_columns * sizeof(int));
+        tileset[i] = (int *)malloc(n_cols * sizeof(int));
         if (tileset[i] == NULL) {
             free_tileset(tileset, i);
             exit(1);

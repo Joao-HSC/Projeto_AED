@@ -9,8 +9,8 @@
 
 int main(int argc, char *argv[]) {
 
-    int num_columns = 0;
-    int num_rows = 0;
+    int n_cols = 0;
+    int n_rows = 0;
     int v = 0;
     int points, n_broken;
     int **tileset;
@@ -23,13 +23,13 @@ int main(int argc, char *argv[]) {
     file = open_file(argc, argv);
     char *ss_name = create_ss(argv);
 
-    while (fscanf(file, "%d %d %d", &num_rows, &num_columns, &v) == 3) {
+    while (fscanf(file, "%d %d %d", &n_rows, &n_cols, &v) == 3) {
   
         head_coords = NULL;
         points = 0;
         n_broken = -1;
 
-        tileset = read_store_tileset(file, num_rows, num_columns);
+        tileset = read_store_tileset(file, n_rows, n_cols);
 
         /* Variant 1 */
         /*
@@ -38,10 +38,10 @@ int main(int argc, char *argv[]) {
         * until there's no stains left.
         */
         if (v == -1) {
-            visited = alloc_visit(num_rows, num_columns);
-            head_coords = var_1(tileset, visited, num_rows, num_columns);
-            free_tileset(tileset, num_rows);
-            free_visited(visited, num_rows);
+            visited = alloc_visit(n_rows, n_cols);
+            head_coords = var_1(tileset, visited, n_rows, n_cols);
+            free_tileset(tileset, n_rows);
+            free_visited(visited, n_rows);
         }
                         
 
@@ -54,11 +54,11 @@ int main(int argc, char *argv[]) {
         */
         else if(v >= 0){
 
-            visited = alloc_visit(num_rows, num_columns);
+            visited = alloc_visit(n_rows, n_cols);
             
-            head_coords = dfs_2(tileset, v, num_rows, num_columns, visited);
-            free_tileset(tileset, num_rows);
-            free_visited(visited, num_rows);
+            head_coords = dfs_2(tileset, v, n_rows, n_cols, visited);
+            free_tileset(tileset, n_rows);
+            free_visited(visited, n_rows);
             
         }
 
@@ -70,11 +70,11 @@ int main(int argc, char *argv[]) {
         * extract its path in the end.
         */
         else if(v == -3){
-            visited = alloc_visit(num_rows, num_columns);
+            visited = alloc_visit(n_rows, n_cols);
             
-            head_coords = dfs_3(tileset, num_rows, num_columns, visited);
+            head_coords = dfs_3(tileset, n_rows, n_cols, visited);
             
-            free_visited(visited, num_rows);
+            free_visited(visited, n_rows);
             printf("end one| ");
         }
 
@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
         }     
 
         /* write file and get ready to restart */
-        write_file(argv, num_rows, num_columns, v, points, n_broken, head_coords, ss_name);       
+        write_file(argv, n_rows, n_cols, v, points, n_broken, head_coords, ss_name);       
 
         /* free list */
         current = head_coords;

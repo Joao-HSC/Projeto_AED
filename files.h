@@ -3,7 +3,7 @@
 #include "tiles.h"
 
 FILE* open_file(int argc, char *argv[]);
-int write_file(char *argv[], int num_rows, int num_columns, int v, int points, int n_broken, Coordinates_plus* head, char *filename);
+int write_file(char *argv[], int n_rows, int n_columns, int v, int points, int n_broken, Coordinates_plus* head, char *filename);
 char *create_ss(char *argv[]);
 void printListBackward(Coordinates_plus* head, FILE* file);
 
