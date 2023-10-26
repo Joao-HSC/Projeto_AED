@@ -239,21 +239,66 @@ Coordinates_plus* coords_list(int** tileset, bool** visited, int n_rows, int n_c
 }
 
 /******************************************************************************
- * coords_list()
+ * best_score_possible()
  *
- * Arguments: tileset, visited, n_row and n_col
- * row, col, n_col and n_row
+ * Arguments: tileset, n_row and n_col
  * 
- * Returns: coordinates_list
+ * 
+ * Returns: the score for 
  * 
  *
- * Description: Analyzes the matrix and returns a a list with the stains' coordinates
+ * Description: Analyzes the matrix and returns the best possible score assuming every 
+ * tile with color x is adjacent with every other tile with the same color
  *****************************************************************************/
-int best_score_possible(int** tileset, bool** visited, int n_rows, int n_cols) {
-    int score = 0;
 
+int best_score_possible(int** tileset, int n_rows, int n_cols) {
+    int total_score = 0;
+    Best_case* head = NULL;
+    Best_case* current = NULL;
+    Best_case* aux = NULL;
 
+    for (int i = 0; i < n_rows; i++) {
+        for (int j = 0; j < n_cols; j++) {
 
-    return score;
+            if(tileset[i][j] == -1) continue;
+            
+            if (head == NULL) {
+                current = (Best_case*) malloc(sizeof(Best_case));
+                current->tile_n = tileset[i][j];
+                current->freq = 1;
+                current->next = NULL;
+                head = current;
+                
+            } else {
+                current = head;
+                while (current != NULL) {
+                    if (current->tile_n == tileset[i][j]) {
+                        current->freq += 1;
+                        break;
+                    }
+                    if (current->next == NULL) { 
+                        aux = (Best_case*) malloc(sizeof(Best_case));
+                        aux->tile_n = tileset[i][j];
+                        aux->freq = 1;
+                        aux->next = NULL;
+                        current->next = aux; 
+                       
+                        break; 
+                    }
+                    current = current->next;
+                }
+            }
+        }
+    }
+
+    current = head;
+    while (current != NULL) {
+        total_score += score(current->freq);
+        aux = current;
+        current = current->next;
+        free(aux);
+    }
+
+    return total_score;
 }
 

@@ -26,6 +26,6 @@ Coordinates_plus* coords_list(int** tileset, bool ** visited, int n_rows, int nu
 int **coords_replace(int** tileset, int row, int col, int n_col, int n_row);
 int score(int n_tiles);
 int **gravity(int **tileset, int n_rows, int n_cols);
-int best_score_possible(int** tileset, bool** visited, int n_rows, int n_cols);
+int best_score_possible(int** tileset, int n_rows, int n_cols);
 
 #endif
