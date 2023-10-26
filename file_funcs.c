@@ -23,7 +23,6 @@ FILE* open_file(int argc, char *argv[]) {
     }
 
     /* must have .tilewalls1 extension */
-
     char *valid_ext = (char *)malloc(strlen(".tilewalls") + 1);
 
     strcpy(valid_ext, ".tilewalls");
@@ -58,6 +57,7 @@ char *create_ss(char *argv[]){
 
     char *filename = argv[1];
 
+    /* alloc memory for the extension */
     char *new_ext = (char *)malloc(strlen(".tileblasts") + 1);
 
     strcpy(new_ext, ".tileblasts");

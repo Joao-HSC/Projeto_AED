@@ -103,7 +103,7 @@ int **coords_replace(int** tileset, int row, int col, int num_row, int num_col) 
             if (0 <= adj_col && adj_col < num_col && 0 <= adj_row && adj_row < num_row) {
                 if (tileset[adj_row][adj_col] == tile_n) {
                     
-                    tileset[adj_row][adj_col] = -1; // Mark as visited.
+                    tileset[adj_row][adj_col] = -1;
 
                     Coordinates new_aux = { adj_row, adj_col };
                     push(front, new_aux);
@@ -232,14 +232,14 @@ Coordinates_plus* coords_list(int** tileset, bool** visited, int num_rows, int n
             }
         }
     }
-    Coordinates_plus* aux = head;
+    /*Coordinates_plus* aux = head;
 if(aux != NULL){
     while(aux != NULL){
     printf("%d %d %d |", aux->row,aux->col, aux->score);
     aux = aux->next;
 }
 
-}else{printf("!no possible plays!");}
+}else{printf("!no possible plays!");}*/
 
     free(front->array);
     free(front);

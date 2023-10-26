@@ -65,7 +65,7 @@ Coordinates_plus *extract_path_3(Node *current){
         Coordinates_plus *path_node = (Coordinates_plus *)malloc(sizeof(Coordinates_plus));
         path_node->row = current->coordinates->row;
         path_node->col = current->coordinates->col;
-        path_node->score = current->score; printf("!%d %d %d |!", current->coordinates->row, current->coordinates->col, current->score);
+        path_node->score = current->score; //printf("!%d %d %d |!", current->coordinates->row, current->coordinates->col, current->score);
         path_node->next = path_head;
         path_head = path_node;
         current = current->parent;
@@ -96,13 +96,14 @@ Node *create_child(Node *current, Coordinates_plus *node_aux, int n_rows, int n_
     child->coordinates->col = node_aux->col;
 
     aux = alloc_tileset(n_rows, n_cols);
-    int** result_from_gravity = gravity(coords_replace(current->tileset, node_aux->row, node_aux->col, n_rows, n_cols), n_rows, n_cols);
 
     for (int i = 0; i < n_rows; i++) {
         for (int j = 0; j < n_cols; j++) {
-            aux[i][j] = result_from_gravity[i][j];
+            aux[i][j] = current->tileset[i][j];
         }
     }
+
+    aux = gravity(coords_replace(aux, node_aux->row, node_aux->col, n_rows, n_cols), n_rows, n_cols);
 
     child->tileset = aux;
     child->children = coords_list(child->tileset, visited, n_rows, n_cols);
@@ -130,20 +131,20 @@ Node *next_branch(Node *current, int n_rows){
     /* while we don't reach the parent of the head_node (NULL), backtrack */
     while (1){
     /* if we reach the head_node and there's no more kids, return NULL */
-        if (current == NULL){ printf("STOPPING |");
-            printf("NULL |");
+        if (current == NULL){//{ printf("STOPPING |");
+           // printf("NULL |");
             return NULL;
         }
         parent = current->parent;
-        /* if there's children associated with a node, free one */
-        if (current->children != NULL){printf("NEXT CHILD! |");
+        /* if there's children associated with a node, free one and explore the next */
+        if (current->children != NULL){//printf("NEXT CHILD! |");
             if (current->children->next != NULL){
                 aux = current->children;
                 current->children = current->children->next;
                 free(aux);
                 return current;
             }
-            printf("GOING BACK |");
+            //printf("GOING BACK |");
             free(current->children);
             free(current->coordinates);
             free_tileset(current->tileset, n_rows);
@@ -158,10 +159,11 @@ Node *next_branch(Node *current, int n_rows){
             current = parent;
         }
     }
+    
 }
 
 /******************************************************************************
- * var 1()
+ * var_1()
  *
  * Arguments: tileset - initial tileset, visited - boolean matrix , n_rows - number of rows in the tileset,
  *  n_columns - number of columns in the tileset
@@ -211,7 +213,6 @@ Coordinates_plus *var_1(int **tileset, bool **visited, int n_rows, int n_cols)
                     current->row = i;
                     current->col = j;
                     current->score = score(aux);
-                    printf("%d |", current->score);
                     current->next = NULL;
                     /* refresh the tileset with the broken stain */
                     tileset = coords_replace(tileset, i, j, n_rows, n_cols);
@@ -257,7 +258,7 @@ Coordinates_plus *dfs_2(int **tileset, int v, int n_rows, int n_cols, bool **vis
     head_node->score = 0;
     head_node->children = coords_list(head_node->tileset, visited, n_rows, n_cols);
     reset_visit(visited, n_rows, n_cols);
-    // printf("%d %d %d |",current->children->row, current->children->col, current->children->score);
+    
     /* if the head_node has no children it means there's nothing we can do */
     if (head_node->children == NULL)
     {
@@ -308,8 +309,7 @@ Coordinates_plus *dfs_2(int **tileset, int v, int n_rows, int n_cols, bool **vis
  * Description: Find the leaf which corresponds to the max score and extract its path
  *****************************************************************************/
 
-Coordinates_plus *dfs_3(int **tileset, int n_rows, int n_cols, bool **visited)
-{
+Coordinates_plus *dfs_3(int **tileset, int n_rows, int n_cols, bool **visited){
     Node *head_node = NULL;
     Node *current = NULL;
     Coordinates_plus *best_path = NULL;
@@ -327,6 +327,7 @@ Coordinates_plus *dfs_3(int **tileset, int n_rows, int n_cols, bool **visited)
     head_node->score = 0;
     head_node->children = coords_list(head_node->tileset, visited, n_rows, n_cols);
     reset_visit(visited, n_rows, n_cols);
+    
 
     /* if the head_node has no children it means there's nothing we can do */
     if (head_node->children == NULL){
@@ -335,6 +336,7 @@ Coordinates_plus *dfs_3(int **tileset, int n_rows, int n_cols, bool **visited)
         free(head_node);
         return NULL;
     }
+    
     current->child = create_child(current, current->children, n_rows, n_cols, visited);
     current = current->child;
 
@@ -342,8 +344,8 @@ Coordinates_plus *dfs_3(int **tileset, int n_rows, int n_cols, bool **visited)
     while (1){
         /*
          * if we find a leaf node we'll check its score to see if it's greater than max_score
-         * if so, we'll retrieve its path
-         * else we'll try to find a new branch
+         * if so, we'll retrieve its path and find a new branch
+         * else we'll just try to find a new branch
          */
         if (current->children == NULL){
             if (current->score > max_score){
@@ -361,12 +363,11 @@ Coordinates_plus *dfs_3(int **tileset, int n_rows, int n_cols, bool **visited)
             }
             /* 
             * if the backtracking returns a new node with children, start creating the new branch
-            * else return the list with the instrucitons for the best score
+            * else return the list with the instructions for the best score
             */
             current = next_branch(current, n_rows);
 
-            if (current == NULL)
-            {
+            if (current == NULL){
                 return best_path;
             }
         }
