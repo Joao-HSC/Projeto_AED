@@ -75,7 +75,6 @@ int main(int argc, char *argv[]) {
             head_coords = dfs_3(tileset, n_rows, n_cols, visited);
             
             free_visited(visited, n_rows);
-            printf("end one| ");
         }
 
         /* calculate points and n_broken based on the head_coords list */
@@ -91,13 +90,17 @@ int main(int argc, char *argv[]) {
             for (n_broken = -1; current != NULL; n_broken++) {
                 if(current->next == NULL) points = current->score;
                 current = current->next;
-            }printf("%d", points);
+            }
         }     
-        if(v >= 0 && points == 0){
+        if(v == 0 && points == 0){
+            n_broken = 0;
+            points = 0;
+        }
+        else if(v > 0 && points == 0){     
             n_broken = 0;
             points = -1;
         }
-        else if(v == 3 && points == 0){     
+        else if(v == -3 && points == 0){     
             n_broken = 0;
         }
         

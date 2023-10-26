@@ -65,7 +65,7 @@ Coordinates_plus *extract_path_3(Node *current){
         Coordinates_plus *path_node = (Coordinates_plus *)malloc(sizeof(Coordinates_plus));
         path_node->row = current->coordinates->row;
         path_node->col = current->coordinates->col;
-        path_node->score = current->score; //printf("!%d %d %d |!", current->coordinates->row, current->coordinates->col, current->score);
+        path_node->score = current->score; 
         path_node->next = path_head;
         path_head = path_node;
         current = current->parent;
@@ -113,7 +113,7 @@ Node *create_child(Node *current, Coordinates_plus *node_aux, int n_rows, int n_
 }
 
 /******************************************************************************
- * next_branch()
+ * next_branch_2()
  *
  * Arguments: current - leaf node, n_rows - number of rows in each tileset
  *
@@ -123,7 +123,7 @@ Node *create_child(Node *current, Coordinates_plus *node_aux, int n_rows, int n_
  * will give us a different score while freeing the nodes we're not using anymore
  *****************************************************************************/
 
-Node *next_branch(Node *current, int n_rows){
+Node *next_branch_2(Node *current, int n_rows){
 
     Coordinates_plus *aux = NULL;
     Node *parent = NULL;
@@ -131,20 +131,70 @@ Node *next_branch(Node *current, int n_rows){
     /* while we don't reach the parent of the head_node (NULL), backtrack */
     while (1){
     /* if we reach the head_node and there's no more kids, return NULL */
-        if (current == NULL){//{ printf("STOPPING |");
-           // printf("NULL |");
+        if (current == NULL){
+      
             return NULL;
         }
         parent = current->parent;
         /* if there's children associated with a node, free one and explore the next */
-        if (current->children != NULL){//printf("NEXT CHILD! |");
+        if (current->children != NULL){
             if (current->children->next != NULL){
                 aux = current->children;
                 current->children = current->children->next;
                 free(aux);
                 return current;
             }
-            //printf("GOING BACK |");
+          
+            free(current->children);
+            free(current->coordinates);
+            free_tileset(current->tileset, n_rows);
+            free(current);
+            current = parent;  
+        }
+        /* if there's no children associated with a node, backtrack */
+        else{
+            free(current->coordinates);
+            free_tileset(current->tileset, n_rows);
+            free(current);
+            current = parent;
+        }
+    }
+    
+}
+
+/******************************************************************************
+ * next_branch_3()
+ *
+ * Arguments: current - leaf node, n_rows - number of rows in each tileset
+ *
+ * Returns: the next node we're able to investigate which has not been analyzed yet
+ *
+ * Description: will start a new branch so we can find an alternative path which
+ * will give us a different score while freeing the nodes we're not using anymore
+ *****************************************************************************/
+
+Node *next_branch_3(Node *current, int n_rows){
+
+    Coordinates_plus *aux = NULL;
+    Node *parent = NULL;
+
+    /* while we don't reach the parent of the head_node (NULL), backtrack */
+    while (1){
+    /* if we reach the head_node and there's no more kids, return NULL */
+        if (current == NULL){
+           
+            return NULL;
+        }
+        parent = current->parent;
+        /* if there's children associated with a node, free one and explore the next */
+        if (current->children != NULL){
+            if (current->children->next != NULL){
+                aux = current->children;
+                current->children = current->children->next;
+                free(aux);
+                return current;
+            }
+           
             free(current->children);
             free(current->coordinates);
             free_tileset(current->tileset, n_rows);
@@ -288,7 +338,7 @@ Coordinates_plus *dfs_2(int **tileset, int v, int n_rows, int n_cols, bool **vis
             * else return the list with the instrucitons for a set of plays 
             * which will give us a score greater or equal than v
             */
-            current = next_branch(current, n_rows);
+            current = next_branch_2(current, n_rows);
             if (current == NULL){
                 return NULL;
             }
@@ -365,7 +415,7 @@ Coordinates_plus *dfs_3(int **tileset, int n_rows, int n_cols, bool **visited){
             * if the backtracking returns a new node with children, start creating the new branch
             * else return the list with the instructions for the best score
             */
-            current = next_branch(current, n_rows);
+            current = next_branch_3(current, n_rows);
 
             if (current == NULL){
                 return best_path;

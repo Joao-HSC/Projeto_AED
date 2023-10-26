@@ -166,26 +166,26 @@ return tileset;
 /******************************************************************************
  * coords_list()
  *
- * Arguments: tileset, visited, n_row and n_col
- * row, col, n_col and n_row
+ * Arguments: tileset, visited, n_rows and n_cols
+ * 
  * 
  * Returns: coordinates_list
  * 
  *
  * Description: Analyzes the matrix and returns a a list with the stains' coordinates
  *****************************************************************************/
-Coordinates_plus* coords_list(int** tileset, bool** visited, int num_rows, int num_col) {
+Coordinates_plus* coords_list(int** tileset, bool** visited, int n_rows, int n_cols) {
     static int drow[] = {0, 0, -1, 1};
     static int dcol[] = {-1, 1, 0, 0};
     int tile_n, n_adj;
  
-    Stack* front = newStack(num_col * num_rows);
+    Stack* front = newStack(n_cols * n_rows);
     Coordinates_plus* head = NULL;
     Coordinates_plus* tail = NULL;
 
     /* search the tileset every tile or so */
-    for (int j = 0; j < num_rows; j++) {
-        for (int h = (j % 2 == 0) ? 1 : 0; h < num_col; h += 2) {
+    for (int j = 0; j < n_rows; j++) {
+        for (int h = (j % 2 == 0) ? 1 : 0; h < n_cols; h += 2) {
             tile_n = tileset[j][h];
 
             if (tile_n == -1 || visited[j][h] == 1) continue;
@@ -202,7 +202,7 @@ Coordinates_plus* coords_list(int** tileset, bool** visited, int num_rows, int n
                     int adj_row = current.row + drow[i];
                     int adj_col = current.col + dcol[i];
 
-                    if (0 <= adj_col && adj_col < num_col && 0 <= adj_row && adj_row < num_rows &&
+                    if (0 <= adj_col && adj_col < n_cols && 0 <= adj_row && adj_row < n_rows &&
                         visited[adj_row][adj_col] != 1) {
                         if (tileset[adj_row][adj_col] == tile_n) {
                             visited[adj_row][adj_col] = 1; 
@@ -232,16 +232,28 @@ Coordinates_plus* coords_list(int** tileset, bool** visited, int num_rows, int n
             }
         }
     }
-    /*Coordinates_plus* aux = head;
-if(aux != NULL){
-    while(aux != NULL){
-    printf("%d %d %d |", aux->row,aux->col, aux->score);
-    aux = aux->next;
-}
-
-}else{printf("!no possible plays!");}*/
 
     free(front->array);
     free(front);
     return head; 
 }
+
+/******************************************************************************
+ * coords_list()
+ *
+ * Arguments: tileset, visited, n_row and n_col
+ * row, col, n_col and n_row
+ * 
+ * Returns: coordinates_list
+ * 
+ *
+ * Description: Analyzes the matrix and returns a a list with the stains' coordinates
+ *****************************************************************************/
+int best_score_possible(int** tileset, bool** visited, int n_rows, int n_cols) {
+    int score = 0;
+
+
+
+    return score;
+}
+
