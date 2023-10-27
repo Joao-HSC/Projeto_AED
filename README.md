@@ -1,3 +1,4 @@
 # TileBlaster
 
-Do not even try to understand this please
+You break the tiles, and the tiles break you
+(mentally)
