@@ -23,9 +23,9 @@ typedef struct Best_case {
 
 int coords_analyze(int** tileset, bool** visited, int row, int col, int n_rows, int n_col);
 Coordinates_plus* coords_list(int** tileset, bool ** visited, int n_rows, int num_col);
-int **coords_replace(int** tileset, int row, int col, int n_col, int n_row);
+int** coords_replace(int** tileset, int row, int col, int n_col, int n_row);
 int score(int n_tiles);
-int **gravity(int **tileset, int n_rows, int n_cols);
+int** gravity(int **tileset, int n_rows, int n_cols);
 int best_score_possible(int** tileset, int n_rows, int n_cols);
 
 #endif

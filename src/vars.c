@@ -109,11 +109,12 @@ Node *create_child(Node *current, Coordinates_plus *node_aux, int n_rows, int n_
     child->children = coords_list(child->tileset, visited, n_rows, n_cols);
     reset_visit(visited, n_rows, n_cols);
     child->score = current->score + node_aux->score;
+    child->potential = best_score_possible(child->tileset, n_rows, n_cols);
     return child;
 }
 
 /******************************************************************************
- * next_branch_2()
+ * next_branch()
  *
  * Arguments: current - leaf node, n_rows - number of rows in each tileset
  *
@@ -123,94 +124,45 @@ Node *create_child(Node *current, Coordinates_plus *node_aux, int n_rows, int n_
  * will give us a different score while freeing the nodes we're not using anymore
  *****************************************************************************/
 
-Node *next_branch_2(Node *current, int n_rows){
-
+Node *next_branch(Node *current, int n_rows) {
     Coordinates_plus *aux = NULL;
     Node *parent = NULL;
 
     /* while we don't reach the parent of the head_node (NULL), backtrack */
-    while (1){
-    /* if we reach the head_node and there's no more kids, return NULL */
-        if (current == NULL){
-      
-            return NULL;
-        }
+    while (current != NULL) {
         parent = current->parent;
+
         /* if there's children associated with a node, free one and explore the next */
-        if (current->children != NULL){
-            if (current->children->next != NULL){
+        if (current->children != NULL) {
+            if (current->children->next != NULL) {
                 aux = current->children;
                 current->children = current->children->next;
                 free(aux);
                 return current;
             }
-          
             free(current->children);
+        }
+
+        /* if we reach the head_node and there's no more kids, return NULL */
+        if (parent == NULL) {
             free(current->coordinates);
             free_tileset(current->tileset, n_rows);
             free(current);
-            current = parent;  
-        }
-        /* if there's no children associated with a node, backtrack */
-        else{
-            free(current->coordinates);
-            free_tileset(current->tileset, n_rows);
-            free(current);
-            current = parent;
-        }
-    }
-    
-}
-
-/******************************************************************************
- * next_branch_3()
- *
- * Arguments: current - leaf node, n_rows - number of rows in each tileset
- *
- * Returns: the next node we're able to investigate which has not been analyzed yet
- *
- * Description: will start a new branch so we can find an alternative path which
- * will give us a different score while freeing the nodes we're not using anymore
- *****************************************************************************/
-
-Node *next_branch_3(Node *current, int n_rows){
-
-    Coordinates_plus *aux = NULL;
-    Node *parent = NULL;
-
-    /* while we don't reach the parent of the head_node (NULL), backtrack */
-    while (1){
-    /* if we reach the head_node and there's no more kids, return NULL */
-        if (current == NULL){
-           
             return NULL;
         }
-        parent = current->parent;
-        /* if there's children associated with a node, free one and explore the next */
-        if (current->children != NULL){
-            if (current->children->next != NULL){
-                aux = current->children;
-                current->children = current->children->next;
-                free(aux);
-                return current;
-            }
-           
-            free(current->children);
-            free(current->coordinates);
-            free_tileset(current->tileset, n_rows);
-            free(current);
-            current = parent;  
-        }
-        /* if there's no children associated with a node, backtrack */
-        else{
-            free(current->coordinates);
-            free_tileset(current->tileset, n_rows);
-            free(current);
-            current = parent;
-        }
+
+        /* if there's no children associated with a node or all children have been explored, backtrack */
+        free(current->coordinates);
+        free_tileset(current->tileset, n_rows);
+        free(current);
+
+        /* move up the tree */
+        current = parent;
     }
-    
+
+    return NULL;  
 }
+
 
 /******************************************************************************
  * var_1()
@@ -290,7 +242,7 @@ Coordinates_plus *var_1(int **tileset, bool **visited, int n_rows, int n_cols)
  * Description: Find the leaf which corresponds to the minimum score and extract its path
  *****************************************************************************/
 
-Coordinates_plus *dfs_2(int **tileset, int v, int n_rows, int n_cols, bool **visited){
+Coordinates_plus* dfs_2(int **tileset, int v, int n_rows, int n_cols, bool **visited){
 
     if(v > best_score_possible(tileset, n_rows, n_cols)){
         free_tileset(tileset, n_rows);
@@ -310,6 +262,7 @@ Coordinates_plus *dfs_2(int **tileset, int v, int n_rows, int n_cols, bool **vis
     head_node->coordinates->col = 0;
     head_node->tileset = tileset;
     head_node->score = 0;
+    head_node->potential = best_score_possible(tileset, n_rows, n_cols);
     head_node->children = coords_list(head_node->tileset, visited, n_rows, n_cols);
     reset_visit(visited, n_rows, n_cols);
     
@@ -326,8 +279,7 @@ Coordinates_plus *dfs_2(int **tileset, int v, int n_rows, int n_cols, bool **vis
     current = current->child;
 
     /* while none of the conditions inside is met we'll keep backtracking and branching the tree */
-    while (1)
-    {
+    while (1){
         /*
          * if we find a leaf node we'll check its score,
          * if it's greater or equal than the the minimum score, we'll retrieve its path
@@ -342,25 +294,31 @@ Coordinates_plus *dfs_2(int **tileset, int v, int n_rows, int n_cols, bool **vis
             * else return the list with the instrucitons for a set of plays 
             * which will give us a score greater or equal than v
             */
-            current = next_branch_2(current, n_rows);
+            current = next_branch(current, n_rows);
+            if (current == NULL){
+                return NULL;
+            }
+            if(v < current->potential + current->score){
+            current->child = create_child(current, current->children, n_rows, n_cols, visited);
+            current = current->child; 
+            }
+        }
+         if(v < current->potential + current->score){
+            current->child = create_child(current, current->children, n_rows, n_cols, visited);
+            current = current->child; 
+        }
+        else{
+            while(current->children != NULL){
+                    aux = current->children;
+                    current->children = current->children->next;
+                    free(aux);
+                }
+            current = next_branch(current, n_rows);
             if (current == NULL){
                 return NULL;
             }
         }
-        /* branch and bound */
-        while (v > best_score_possible(current->tileset, n_rows, n_cols) + current->score){
-            aux = current->children;
-            while(current->children != NULL){
-                aux = current->children;
-                current->children =  current->children->next;
-                free(aux);
-            }
-            current = next_branch_2(current, n_rows);
-        }
-        if (current->children != NULL){
-            current->child = create_child(current, current->children, n_rows, n_cols, visited);
-            current = current->child;
-        }
+        
     }
 }
 
@@ -375,7 +333,7 @@ Coordinates_plus *dfs_2(int **tileset, int v, int n_rows, int n_cols, bool **vis
  * Description: Find the leaf which corresponds to the max score and extract its path
  *****************************************************************************/
 
-Coordinates_plus *dfs_3(int **tileset, int n_rows, int n_cols, bool **visited){
+Coordinates_plus* dfs_3(int **tileset, int n_rows, int n_cols, bool **visited){
 
     Node *head_node = NULL;
     Node *current = NULL;
@@ -393,6 +351,7 @@ Coordinates_plus *dfs_3(int **tileset, int n_rows, int n_cols, bool **visited){
     head_node->coordinates->col = 0;
     head_node->tileset = tileset;
     head_node->score = 0;
+    head_node->potential = best_score_possible(tileset, n_rows, n_cols);
     head_node->children = coords_list(head_node->tileset, visited, n_rows, n_cols);
     reset_visit(visited, n_rows, n_cols);
 
@@ -420,7 +379,7 @@ Coordinates_plus *dfs_3(int **tileset, int n_rows, int n_cols, bool **visited){
 
                 /* free the previous best path */
                 while (best_path != NULL){
-                    Coordinates_plus *aux = best_path;
+                    aux = best_path;
                     best_path = best_path->next;
                     free(aux);
                 }
@@ -432,28 +391,26 @@ Coordinates_plus *dfs_3(int **tileset, int n_rows, int n_cols, bool **visited){
             * if the backtracking returns a new node with children, start creating the new branch
             * else return the list with the instructions for the best score
             */
-            current = next_branch_3(current, n_rows);
-
+            current = next_branch(current, n_rows);
             if (current == NULL){
                 return best_path;
             }
         }
-        /* branch and bound */
-        while (max_score > best_score_possible(current->tileset, n_rows, n_cols) + current->score){
-            aux = current->children;
-            while(current->children != NULL){
-                aux = current->children;
-                current->children =  current->children->next;
-                free(aux);
-            }
-            current = next_branch_2(current, n_rows);
-            if (current == NULL){
-                return best_path;
-            }
-        }
-        if (current->children != NULL){
+        if(max_score < current->potential + current->score){
             current->child = create_child(current, current->children, n_rows, n_cols, visited);
-            current = current->child;
+            current = current->child; 
         }
+        else{
+            while(current->children != NULL){
+                    aux = current->children;
+                    current->children = current->children->next;
+                    free(aux);
+                }
+            current = next_branch(current, n_rows);
+            if (current == NULL){
+                return best_path;
+            }
+        }
+        
     }
 }

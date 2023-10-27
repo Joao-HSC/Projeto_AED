@@ -16,6 +16,7 @@
  * Description: Calculates the score based on the input number
  *****************************************************************************/
 int score(int n_tiles){
+
     return n_tiles*(n_tiles - 1);
 }
 
@@ -131,6 +132,7 @@ int **coords_replace(int** tileset, int row, int col, int num_row, int num_col) 
  *****************************************************************************/
 
 int **gravity(int **tileset, int num_rows, int num_columns) {
+
    for (int i = 0; i < num_columns; i++) {
     int fall = 0;
     
@@ -141,7 +143,8 @@ int **gravity(int **tileset, int num_rows, int num_columns) {
             if (fall > 0) {
                 tileset[j][i] = -1;
             }
-        } else {
+        } 
+        else {
             fall++;
         }
     }
@@ -269,7 +272,8 @@ int best_score_possible(int** tileset, int n_rows, int n_cols) {
                 current->next = NULL;
                 head = current;
                 
-            } else {
+            } 
+            else {
                 current = head;
                 while (current != NULL) {
                     if (current->tile_n == tileset[i][j]) {
@@ -298,7 +302,7 @@ int best_score_possible(int** tileset, int n_rows, int n_cols) {
         current = current->next;
         free(aux);
     }
-
+    
     return total_score;
 }
 
