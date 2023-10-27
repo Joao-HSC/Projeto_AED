@@ -290,12 +290,16 @@ Coordinates_plus *var_1(int **tileset, bool **visited, int n_rows, int n_cols)
  * Description: Find the leaf which corresponds to the minimum score and extract its path
  *****************************************************************************/
 
-Coordinates_plus *dfs_2(int **tileset, int v, int n_rows, int n_cols, bool **visited)
-{
+Coordinates_plus *dfs_2(int **tileset, int v, int n_rows, int n_cols, bool **visited){
+
+    if(v > best_score_possible(tileset, n_rows, n_cols)){
+        free_tileset(tileset, n_rows);
+        return NULL;
+    }
 
     Node *head_node = NULL;
     Node *current = NULL;
-    int min_score = v;
+    Coordinates_plus *aux = NULL;
 
     /* initialize head_node */
     current = (Node *)malloc(sizeof(Node));
@@ -330,7 +334,7 @@ Coordinates_plus *dfs_2(int **tileset, int v, int n_rows, int n_cols, bool **vis
          * else we'll try to find a new branch
          */
         if (current->children == NULL){
-            if (current->score >= min_score){
+            if (current->score >= v){
                 return extract_path_2(current, n_rows);
             }
             /* 
@@ -343,8 +347,20 @@ Coordinates_plus *dfs_2(int **tileset, int v, int n_rows, int n_cols, bool **vis
                 return NULL;
             }
         }
-        current->child = create_child(current, current->children, n_rows, n_cols, visited);
-        current = current->child;
+        /* branch and bound */
+        while (v > best_score_possible(current->tileset, n_rows, n_cols) + current->score){
+            aux = current->children;
+            while(current->children != NULL){
+                aux = current->children;
+                current->children =  current->children->next;
+                free(aux);
+            }
+            current = next_branch_2(current, n_rows);
+        }
+        if (current->children != NULL){
+            current->child = create_child(current, current->children, n_rows, n_cols, visited);
+            current = current->child;
+        }
     }
 }
 
@@ -360,9 +376,11 @@ Coordinates_plus *dfs_2(int **tileset, int v, int n_rows, int n_cols, bool **vis
  *****************************************************************************/
 
 Coordinates_plus *dfs_3(int **tileset, int n_rows, int n_cols, bool **visited){
+
     Node *head_node = NULL;
     Node *current = NULL;
     Coordinates_plus *best_path = NULL;
+    Coordinates_plus *aux = NULL;
     int max_score = -1;
 
     /* initialize head_node */
@@ -377,7 +395,6 @@ Coordinates_plus *dfs_3(int **tileset, int n_rows, int n_cols, bool **visited){
     head_node->score = 0;
     head_node->children = coords_list(head_node->tileset, visited, n_rows, n_cols);
     reset_visit(visited, n_rows, n_cols);
-    
 
     /* if the head_node has no children it means there's nothing we can do */
     if (head_node->children == NULL){
@@ -421,8 +438,22 @@ Coordinates_plus *dfs_3(int **tileset, int n_rows, int n_cols, bool **visited){
                 return best_path;
             }
         }
-        
-        current->child = create_child(current, current->children, n_rows, n_cols, visited);
-        current = current->child;
+        /* branch and bound */
+        while (max_score > best_score_possible(current->tileset, n_rows, n_cols) + current->score){
+            aux = current->children;
+            while(current->children != NULL){
+                aux = current->children;
+                current->children =  current->children->next;
+                free(aux);
+            }
+            current = next_branch_2(current, n_rows);
+            if (current == NULL){
+                return best_path;
+            }
+        }
+        if (current->children != NULL){
+            current->child = create_child(current, current->children, n_rows, n_cols, visited);
+            current = current->child;
+        }
     }
 }

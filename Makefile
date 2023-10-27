@@ -1,12 +1,16 @@
 CC = gcc
-CFLAGS = -Wall -std=c99 -O3
+CFLAGS = -Wall -std=c99 -O3 -g
 SRCS = tileblaster.c file_funcs.c tile_funcs.c stack.c mem.c vars.c
+OBJS = $(SRCS:.c=.o)
 TARGET = tileblaster
 
 all: $(TARGET)
 
-$(TARGET): 
-	$(CC) $(CFLAGS) $(SRCS) -o $(TARGET)
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(TARGET) Makefile
+	rm -f $(OBJS) $(TARGET) Makefile
